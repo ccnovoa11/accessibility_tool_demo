@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Accessibility Tool</string>
+    <string name="service_name">Accessibility Scan Tool</string>
+</resources>
