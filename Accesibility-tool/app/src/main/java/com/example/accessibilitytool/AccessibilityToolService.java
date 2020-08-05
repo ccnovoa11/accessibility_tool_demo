@@ -57,12 +57,11 @@ public class AccessibilityToolService extends AccessibilityService {
 
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
-//        Log.d("WARDIOLA", event.toString());
         if(writeReport){
             switch (event.getEventType()){
                 case AccessibilityEvent.TYPE_VIEW_CLICKED:
                     try{
-                        writeInFile("<p>"+event.getSource()+"</p>");
+                        writeInFile("<p>"+A11yNodeInfo.wrap(getRootInActiveWindow()).toViewHeirarchy()+"</p>");
                         Log.d("WARDIOLA2", A11yNodeInfo.wrap(getRootInActiveWindow()).toViewHeirarchy());
 
                     }catch (Exception e){
@@ -82,38 +81,8 @@ public class AccessibilityToolService extends AccessibilityService {
         startButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 writeReport = true;
                 writeInFile("<html><body><h2>ACCESSIBILITY REPORT</h2>");
-
-//                try {
-//                    Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-//                    // catches IOException below
-////                    BufferedWriter bw = new BufferedWriter(new FileWriter("report.html"));
-////                    bw.write("<html><head><title>New Page</title></head><body><p>This is Body</p></body></html>");
-////                    bw.close();
-//
-//                    /* We have to use the openFileOutput()-method
-//                     * the ActivityContext provides, to
-//                     * protect your file from others and
-//                     * This is done for security-reasons.
-//                     * We chose MODE_WORLD_READABLE, because
-//                     *  we have nothing to hide in our file */
-//                    fOut = new FileOutputStream(new File(getExternalFilesDir(null),"report.html"), true);
-//                    osw = new OutputStreamWriter(fOut);
-//                    OutputStreamWriter osw = new OutputStreamWriter(fOut);
-//                    // Write the string to the file
-//                    osw.write("<html><body><h1>ACCESSIBILITY REPORT</h1>");
-//
-//                    /* ensure that everything is
-//                     * really written out and close */
-//                    osw.flush();
-//                    osw.close();
-//
-//                } catch (IOException ioe) {
-//                    ioe.printStackTrace();
-//                }
-
                 Toast toast = Toast.makeText(getApplicationContext(),
                         "Start button",
                         Toast.LENGTH_SHORT);
@@ -140,23 +109,11 @@ public class AccessibilityToolService extends AccessibilityService {
     public void writeInFile(String append){
         try {
             Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-            // catches IOException below
-//                    BufferedWriter bw = new BufferedWriter(new FileWriter("report.html"));
-//                    bw.write("<html><head><title>New Page</title></head><body><p>This is Body</p></body></html>");
-//                    bw.close();
-
-            /* We have to use the openFileOutput()-method
-             * the ActivityContext provides, to
-             * protect your file from others and
-             * This is done for security-reasons.
-             * We chose MODE_WORLD_READABLE, because
-             *  we have nothing to hide in our file */
             fOut = new FileOutputStream(new File(getExternalFilesDir(null),"report.html"), true);
             osw = new OutputStreamWriter(fOut);
             OutputStreamWriter osw = new OutputStreamWriter(fOut);
             // Write the string to the file
             osw.write(append);
-
             /* ensure that everything is
              * really written out and close */
             osw.flush();

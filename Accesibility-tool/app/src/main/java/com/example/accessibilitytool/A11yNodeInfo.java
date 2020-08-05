@@ -1,10 +1,14 @@
 package com.example.accessibilitytool;
 
+import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Rect;
 import android.os.Build.VERSION;
 import androidx.viewpager.widget.ViewPager ;
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat;
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat.AccessibilityActionCompat;
+
+import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.accessibility.AccessibilityNodeInfo;
 import android.view.accessibility.AccessibilityNodeInfo.AccessibilityAction;
@@ -20,6 +24,15 @@ import java.util.List;
 public class A11yNodeInfo implements Iterable<A11yNodeInfo>, Comparator<A11yNodeInfo> {
     private static final ArrayList<Class<? extends View>> ACTIVE_CLASSES = new ArrayList();
     private final AccessibilityNodeInfoCompat mNodeInfo;
+
+    public static String BUTTON = "android.widget.Button";
+    public static String IMAGE_BUTTON = "android.widget.ImageButton";
+    public static String CHECKBOX = "android.widget.CheckBox";
+    public static String IMAGE_VIEW = "android.widget.ImageView";
+
+    public int contentDescriptionIssues = 0;
+    public int touchAreaIssues = 0;
+
 
     public static A11yNodeInfo wrap(AccessibilityNodeInfo node) {
         return node == null ? null : new A11yNodeInfo(node);
@@ -211,18 +224,46 @@ public class A11yNodeInfo implements Iterable<A11yNodeInfo>, Comparator<A11yNode
 
     public String toViewHeirarchy() {
         final StringBuilder result = new StringBuilder();
-        result.append("--------------- Accessibility Node Hierarchy ---------------\n");
+        result.append("<h3> Accessibility Event Detected </h3>\n");
         this.visitNodes(new A11yNodeInfo.OnVisitListener() {
             public boolean onVisit(A11yNodeInfo nodeInfo) {
-                result.append(nodeInfo.getClassName());
-                result.append(' ');
-                result.append(nodeInfo.getContentDescription());
-                result.append('\n');
+                elementHasIssue(nodeInfo);
+                result.append("Element: "+nodeInfo.getClassName() + "<br>");
+                result.append("Text: "+nodeInfo.getTextAsString() + "<br>");
+                result.append("Content Description: "+nodeInfo.getContentDescription() + "<br>");
+                result.append("Width: "+ convertPixelsToDp(nodeInfo.getBoundsInScreen().width()) + "<br>");
+                result.append(" Height: "+convertPixelsToDp(nodeInfo.getBoundsInScreen().height()) + "<br>");
+                result.append("-------------------------------------------------------------------<br>");
+
+//                result.append('\n');
                 return false;
             }
+
         });
-        result.append("--------------- Accessibility Node Hierarchy ---------------");
+        result.append("Elements with contentDescription issues: " + contentDescriptionIssues + "<br>");
+        result.append("Elements with touchArea issues: " + touchAreaIssues);
+        resetValues();
         return result.toString();
+    }
+
+    public void elementHasIssue(A11yNodeInfo nodeInfo){
+        if (nodeInfo.getClassName().equals(BUTTON) || nodeInfo.getClassName().equals(IMAGE_BUTTON) || nodeInfo.getClassName().equals(CHECKBOX)){
+            if (nodeInfo.getTextAsString().equals(null) || nodeInfo.getContentDescription().toString().equals(null)){
+                contentDescriptionIssues++;
+            }
+            if (convertPixelsToDp(nodeInfo.getBoundsInScreen().width())<48 && convertPixelsToDp(nodeInfo.getBoundsInScreen().height())<48){
+                touchAreaIssues++;
+            }
+        }
+    }
+
+    public void resetValues(){
+        contentDescriptionIssues = 0;
+        touchAreaIssues = 0;
+    }
+
+    public static float convertPixelsToDp(float px){
+        return (int) (px / Resources.getSystem().getDisplayMetrics().density);
     }
 
 
