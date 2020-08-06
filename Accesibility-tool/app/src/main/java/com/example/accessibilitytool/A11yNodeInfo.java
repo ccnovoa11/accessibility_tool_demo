@@ -228,14 +228,6 @@ public class A11yNodeInfo implements Iterable<A11yNodeInfo>, Comparator<A11yNode
         this.visitNodes(new A11yNodeInfo.OnVisitListener() {
             public boolean onVisit(A11yNodeInfo nodeInfo) {
                 elementHasIssue(nodeInfo, result);
-//                result.append("<p>Element: "+nodeInfo.getClassName() + "</p>");
-//                result.append("<p>Text: "+nodeInfo.getText() + "</p>");
-//                result.append("<p>Content Description: "+nodeInfo.getContentDescription() + "</p>");
-//                result.append("<p>Width: "+ convertPixelsToDp(nodeInfo.getBoundsInScreen().width()) + "dp</p>");
-//                result.append("<p>Height: "+convertPixelsToDp(nodeInfo.getBoundsInScreen().height()) + "dp</p>");
-//                result.append("<p>-------------------------------------------------------------------</p>");
-
-//                result.append('\n');
                 return false;
             }
 
