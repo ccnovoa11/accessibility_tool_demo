@@ -240,26 +240,20 @@ public class A11yNodeInfo implements Iterable<A11yNodeInfo>, Comparator<A11yNode
     }
 
     public void elementHasIssue(A11yNodeInfo nodeInfo, StringBuilder result){
-        if (nodeInfo.getClassName().equals(BUTTON)){
-            if (nodeInfo.getText() == null){
-                writeParagraphNoText(nodeInfo, result);
-                contentDescriptionIssues++;
+        if ((nodeInfo.getClassName().equals(BUTTON)) && nodeInfo.getText() == null){
+            writeParagraphNoText(nodeInfo, result);
+            contentDescriptionIssues++;
+        } else if (nodeInfo.getClassName().equals(BUTTON) && convertPixelsToDp(nodeInfo.getBoundsInScreen().width())<48 && convertPixelsToDp(nodeInfo.getBoundsInScreen().height())<48){
+            writeParagraphTouchAreaIssue(nodeInfo, result);
+            touchAreaIssues++;
+        } else if ((nodeInfo.getClassName().equals(IMAGE_VIEW) || nodeInfo.getClassName().equals(IMAGE_BUTTON) || nodeInfo.getClassName().equals(CHECKBOX)) && nodeInfo.getContentDescription() == null){
 
-            }
-            if (convertPixelsToDp(nodeInfo.getBoundsInScreen().width())<48 && convertPixelsToDp(nodeInfo.getBoundsInScreen().height())<48){
-                writeParagraphTouchAreaIssue(nodeInfo, result);
-                touchAreaIssues++;
-            }
-        }else if (nodeInfo.getClassName().equals(IMAGE_VIEW) || nodeInfo.getClassName().equals(IMAGE_BUTTON) || nodeInfo.getClassName().equals(CHECKBOX)){
-            if (nodeInfo.getContentDescription() == null){
-                writeParagraphNoContentDescription(nodeInfo, result);
-                contentDescriptionIssues++;
-            }
-            if (convertPixelsToDp(nodeInfo.getBoundsInScreen().width())<48 && convertPixelsToDp(nodeInfo.getBoundsInScreen().height())<48){
-                writeParagraphTouchAreaIssue(nodeInfo, result);
-                touchAreaIssues++;
-            }
-        } else {
+            writeParagraphNoContentDescription(nodeInfo, result);
+            contentDescriptionIssues++;
+        }else if ((nodeInfo.getClassName().equals(IMAGE_VIEW) || nodeInfo.getClassName().equals(IMAGE_BUTTON) || nodeInfo.getClassName().equals(CHECKBOX)) && convertPixelsToDp(nodeInfo.getBoundsInScreen().width())<48 && convertPixelsToDp(nodeInfo.getBoundsInScreen().height())<48){
+            writeParagraphTouchAreaIssue(nodeInfo, result);
+            touchAreaIssues++;
+        }else {
             result.append("<p>-------------------------------------------------------------------</p>");
             result.append("<p>Element: "+nodeInfo.getClassName() + "</p>");
             result.append("<p>Text: "+nodeInfo.getText() + "</p>");
@@ -267,7 +261,6 @@ public class A11yNodeInfo implements Iterable<A11yNodeInfo>, Comparator<A11yNode
             result.append("<p>Width: "+ convertPixelsToDp(nodeInfo.getBoundsInScreen().width()) + "dp</p>");
             result.append("<p>Height: "+convertPixelsToDp(nodeInfo.getBoundsInScreen().height()) + "dp</p>");
         }
-
     }
 
     public void writeParagraphNoText(A11yNodeInfo nodeInfo, StringBuilder result){

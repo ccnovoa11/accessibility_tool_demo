@@ -34,7 +34,6 @@ public class AccessibilityToolService extends AccessibilityService {
     OutputStreamWriter osw;
     Boolean writeReport = false;
 
-    static final String HTML = new String("<html>");
     @Override
     protected void onServiceConnected() {
         // Create an overlay and display the action bar
