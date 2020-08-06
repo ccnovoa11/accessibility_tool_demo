@@ -61,7 +61,7 @@ public class AccessibilityToolService extends AccessibilityService {
             switch (event.getEventType()){
                 case AccessibilityEvent.TYPE_VIEW_CLICKED:
                     try{
-                        writeInFile("<p>"+A11yNodeInfo.wrap(getRootInActiveWindow()).toViewHeirarchy()+"</p>");
+                        writeInFile(A11yNodeInfo.wrap(getRootInActiveWindow()).toViewHeirarchy());
                         Log.d("WARDIOLA2", A11yNodeInfo.wrap(getRootInActiveWindow()).toViewHeirarchy());
 
                     }catch (Exception e){

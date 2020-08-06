@@ -224,37 +224,86 @@ public class A11yNodeInfo implements Iterable<A11yNodeInfo>, Comparator<A11yNode
 
     public String toViewHeirarchy() {
         final StringBuilder result = new StringBuilder();
-        result.append("<h3> Accessibility Event Detected </h3>\n");
+        result.append("<h2> Accessibility Event Detected </h2>\n");
         this.visitNodes(new A11yNodeInfo.OnVisitListener() {
             public boolean onVisit(A11yNodeInfo nodeInfo) {
-                elementHasIssue(nodeInfo);
-                result.append("Element: "+nodeInfo.getClassName() + "<br>");
-                result.append("Text: "+nodeInfo.getTextAsString() + "<br>");
-                result.append("Content Description: "+nodeInfo.getContentDescription() + "<br>");
-                result.append("Width: "+ convertPixelsToDp(nodeInfo.getBoundsInScreen().width()) + "<br>");
-                result.append(" Height: "+convertPixelsToDp(nodeInfo.getBoundsInScreen().height()) + "<br>");
-                result.append("-------------------------------------------------------------------<br>");
+                elementHasIssue(nodeInfo, result);
+//                result.append("<p>Element: "+nodeInfo.getClassName() + "</p>");
+//                result.append("<p>Text: "+nodeInfo.getText() + "</p>");
+//                result.append("<p>Content Description: "+nodeInfo.getContentDescription() + "</p>");
+//                result.append("<p>Width: "+ convertPixelsToDp(nodeInfo.getBoundsInScreen().width()) + "dp</p>");
+//                result.append("<p>Height: "+convertPixelsToDp(nodeInfo.getBoundsInScreen().height()) + "dp</p>");
+//                result.append("<p>-------------------------------------------------------------------</p>");
 
 //                result.append('\n');
                 return false;
             }
 
         });
-        result.append("Elements with contentDescription issues: " + contentDescriptionIssues + "<br>");
-        result.append("Elements with touchArea issues: " + touchAreaIssues);
+        result.append("<p>-------------------------------------------------------------------</p>");
+        result.append("<p><strong>Elements with contentDescription issues:</strong> " + contentDescriptionIssues + "</p>");
+        result.append("<p><strong>Elements with touchArea issues:</strong> "+ touchAreaIssues + "</p>");
         resetValues();
         return result.toString();
     }
 
-    public void elementHasIssue(A11yNodeInfo nodeInfo){
-        if (nodeInfo.getClassName().equals(BUTTON) || nodeInfo.getClassName().equals(IMAGE_BUTTON) || nodeInfo.getClassName().equals(CHECKBOX)){
-            if (nodeInfo.getTextAsString().equals(null) || nodeInfo.getContentDescription().toString().equals(null)){
+    public void elementHasIssue(A11yNodeInfo nodeInfo, StringBuilder result){
+        if (nodeInfo.getClassName().equals(BUTTON)){
+            if (nodeInfo.getText() == null){
+                writeParagraphNoText(nodeInfo, result);
+                contentDescriptionIssues++;
+
+            }
+            if (convertPixelsToDp(nodeInfo.getBoundsInScreen().width())<48 && convertPixelsToDp(nodeInfo.getBoundsInScreen().height())<48){
+                writeParagraphTouchAreaIssue(nodeInfo, result);
+                touchAreaIssues++;
+            }
+        }else if (nodeInfo.getClassName().equals(IMAGE_VIEW) || nodeInfo.getClassName().equals(IMAGE_BUTTON) || nodeInfo.getClassName().equals(CHECKBOX)){
+            if (nodeInfo.getContentDescription() == null){
+                writeParagraphNoContentDescription(nodeInfo, result);
                 contentDescriptionIssues++;
             }
             if (convertPixelsToDp(nodeInfo.getBoundsInScreen().width())<48 && convertPixelsToDp(nodeInfo.getBoundsInScreen().height())<48){
+                writeParagraphTouchAreaIssue(nodeInfo, result);
                 touchAreaIssues++;
             }
+        } else {
+            result.append("<p>-------------------------------------------------------------------</p>");
+            result.append("<p>Element: "+nodeInfo.getClassName() + "</p>");
+            result.append("<p>Text: "+nodeInfo.getText() + "</p>");
+            result.append("<p>Content Description: "+nodeInfo.getContentDescription() + "</p>");
+            result.append("<p>Width: "+ convertPixelsToDp(nodeInfo.getBoundsInScreen().width()) + "dp</p>");
+            result.append("<p>Height: "+convertPixelsToDp(nodeInfo.getBoundsInScreen().height()) + "dp</p>");
         }
+
+    }
+
+    public void writeParagraphNoText(A11yNodeInfo nodeInfo, StringBuilder result){
+        result.append("<p>-------------------------------------------------------------------</p>");
+        result.append("<p>Element: "+nodeInfo.getClassName() + "</p>");
+        result.append("<p style=\"color:#FF0000\";>Text: "+nodeInfo.getText() + "</p>");
+        result.append("<p>Content Description: "+nodeInfo.getContentDescription() + "</p>");
+        result.append("<p>Width: "+ convertPixelsToDp(nodeInfo.getBoundsInScreen().width()) + "dp</p>");
+        result.append("<p>Height: "+convertPixelsToDp(nodeInfo.getBoundsInScreen().height()) + "dp</p>");
+
+    }
+
+    public void writeParagraphNoContentDescription(A11yNodeInfo nodeInfo, StringBuilder result){
+        result.append("<p>-------------------------------------------------------------------</p>");
+        result.append("<p>Element: "+nodeInfo.getClassName() + "</p>");
+        result.append("<p>Text: "+nodeInfo.getText() + "</p>");
+        result.append("<p style=\"color:#FF0000\";>Content Description: "+nodeInfo.getContentDescription() + "</p>");
+        result.append("<p>Width: "+ convertPixelsToDp(nodeInfo.getBoundsInScreen().width()) + "dp</p>");
+        result.append("<p>Height: "+convertPixelsToDp(nodeInfo.getBoundsInScreen().height()) + "dp</p>");
+    }
+
+    public void writeParagraphTouchAreaIssue(A11yNodeInfo nodeInfo, StringBuilder result){
+        result.append("<p>-------------------------------------------------------------------</p>");
+        result.append("<p>Element: "+nodeInfo.getClassName() + "</p>");
+        result.append("<p>Text: "+nodeInfo.getText() + "</p>");
+        result.append("<p>Content Description: "+nodeInfo.getContentDescription() + "</p>");
+        result.append("<p style=\"color:#FF0000\";>Width: "+ convertPixelsToDp(nodeInfo.getBoundsInScreen().width()) + "dp</p>");
+        result.append("<p style=\"color:#FF0000\";>Height: "+convertPixelsToDp(nodeInfo.getBoundsInScreen().height()) + "dp</p>");
     }
 
     public void resetValues(){
